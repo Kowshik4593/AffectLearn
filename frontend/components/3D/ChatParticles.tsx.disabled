@@ -1,0 +1,108 @@
+'use client'
+
+import React, { useEffect, useRef } from 'react';
+
+interface ChatParticlesProps {
+  darkMode?: boolean;
+}
+
+const ChatParticles: React.FC<ChatParticlesProps> = ({ darkMode = false }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const createParticle = () => {
+      const particle = document.createElement('div');
+      particle.className = 'enhanced-chat-particle';
+      
+      // Random starting position
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 25 + 's';
+      particle.style.animationDuration = (Math.random() * 20 + 25) + 's';
+      
+      // Enhanced colors based on theme
+      const colors = darkMode 
+        ? [
+            'rgba(0, 255, 136, 0.8)', 
+            'rgba(0, 212, 255, 0.7)', 
+            'rgba(139, 92, 246, 0.8)',
+            'rgba(255, 107, 107, 0.6)',
+            'rgba(0, 255, 136, 0.9)'
+          ]
+        : [
+            'rgba(0, 212, 255, 0.6)', 
+            'rgba(0, 255, 136, 0.5)', 
+            'rgba(99, 102, 241, 0.6)',
+            'rgba(139, 92, 246, 0.5)',
+            'rgba(0, 168, 255, 0.7)'
+          ];
+      
+      particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+      
+      // Variable sizes and shapes
+      const size = Math.random() * 4 + 2;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      
+      // Add glow effect
+      particle.style.boxShadow = `0 0 ${size * 2}px ${colors[Math.floor(Math.random() * colors.length)]}`;
+      
+      // Random rotation and movement
+      particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+      
+      container.appendChild(particle);
+
+      // Remove particle after animation
+      setTimeout(() => {
+        if (container.contains(particle)) {
+          container.removeChild(particle);
+        }
+      }, 45000);
+    };
+
+    const createFloatingOrb = () => {
+      const orb = document.createElement('div');
+      orb.className = 'floating-orb';
+      orb.style.left = Math.random() * 90 + '%';
+      orb.style.animationDelay = Math.random() * 10 + 's';
+      orb.style.animationDuration = (Math.random() * 8 + 12) + 's';
+      
+      const orbColors = darkMode 
+        ? ['rgba(0, 255, 136, 0.3)', 'rgba(139, 92, 246, 0.3)']
+        : ['rgba(0, 212, 255, 0.2)', 'rgba(99, 102, 241, 0.2)'];
+      
+      orb.style.background = orbColors[Math.floor(Math.random() * orbColors.length)];
+      
+      container.appendChild(orb);
+      
+      setTimeout(() => {
+        if (container.contains(orb)) {
+          container.removeChild(orb);
+        }
+      }, 20000);
+    };
+
+    const particleInterval = setInterval(createParticle, 800);
+    const orbInterval = setInterval(createFloatingOrb, 3000);
+    
+    // Create initial particles and orbs
+    for (let i = 0; i < 5; i++) {
+      setTimeout(createParticle, i * 200);
+    }
+    
+    for (let i = 0; i < 2; i++) {
+      setTimeout(createFloatingOrb, i * 1000);
+    }
+
+    return () => {
+      clearInterval(particleInterval);
+      clearInterval(orbInterval);
+    };
+  }, [darkMode]);
+
+  return <div ref={containerRef} className="chat-particles" />;
+};
+
+export default ChatParticles;

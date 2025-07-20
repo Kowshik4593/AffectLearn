@@ -1,0 +1,239 @@
+'use client'
+
+import React, { useRef, useMemo, Suspense } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { Points, PointMaterial, Sphere, MeshDistortMaterial } from '@react-three/drei'
+import * as THREE from 'three'
+
+function EnhancedStars(props: any) {
+  const ref = useRef<THREE.Group>(null)
+  
+  // Generate random sphere positions for stars with better distribution
+  const sphere = useMemo(() => {
+    const positions = new Float32Array(8000 * 3)
+    for (let i = 0; i < 8000; i++) {
+      const radius = 1 + Math.random() * 2.5
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.acos(2 * Math.random() - 1)
+      
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta)
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta)
+      positions[i * 3 + 2] = radius * Math.cos(phi)
+    }
+    return positions
+  }, [])
+  
+  useFrame((state, delta) => {
+    if (ref.current) {
+      ref.current.rotation.x -= delta / 12
+      ref.current.rotation.y -= delta / 18
+      ref.current.rotation.z += delta / 25
+    }
+  })
+  
+  return (
+    <group rotation={[0, 0, Math.PI / 4]}>
+      <Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
+        <PointMaterial
+          transparent
+          color={props.darkMode ? "#00FF88" : "#00D4FF"}
+          size={0.003}
+          sizeAttenuation={true}
+          depthWrite={false}
+        />
+      </Points>
+    </group>
+  )
+}
+
+function EnhancedFloatingOrbs({ darkMode }: { darkMode?: boolean }) {
+  const orbsRef = useRef<THREE.Group>(null)
+  
+  useFrame(({ clock }) => {
+    if (orbsRef.current) {
+      orbsRef.current.rotation.y = clock.elapsedTime * 0.1
+      orbsRef.current.position.y = Math.sin(clock.elapsedTime * 0.5) * 0.2
+    }
+  })
+  
+  return (
+    <group ref={orbsRef}>
+      {/* Large central pulsing orb */}
+      <Sphere args={[0.8, 64, 64]} position={[0, 0, -6]}>
+        <MeshDistortMaterial
+          color={darkMode ? "#00FF88" : "#00D4FF"}
+          transparent
+          opacity={0.15}
+          distort={0.3}
+          speed={2}
+          wireframe
+        />
+      </Sphere>
+      
+      {/* Secondary glowing orb */}
+      <Sphere args={[0.4, 32, 32]} position={[2, 1, -4]}>
+        <MeshDistortMaterial
+          color={darkMode ? "#8B5CF6" : "#6366F1"}
+          transparent
+          opacity={0.2}
+          distort={0.2}
+          speed={1.5}
+        />
+      </Sphere>
+      
+      {/* Floating smaller orbs */}
+      {Array.from({ length: 12 }).map((_, i) => (
+        <mesh
+          key={i}
+          position={[
+            Math.sin((i / 12) * Math.PI * 2) * 4,
+            Math.cos((i / 12) * Math.PI * 2) * 3,
+            Math.sin((i / 12) * Math.PI * 6) * 2
+          ]}
+        >
+          <sphereGeometry args={[0.08, 16, 16]} />
+          <meshBasicMaterial
+            color={
+              i % 3 === 0 
+                ? (darkMode ? "#00FF88" : "#00D4FF") 
+                : i % 3 === 1 
+                ? "#8B5CF6" 
+                : "#FF6B6B"
+            }
+            transparent
+            opacity={0.7}
+          />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function EnhancedNeuralNetwork({ darkMode }: { darkMode?: boolean }) {
+  const networkRef = useRef<THREE.Group>(null)
+  
+  useFrame(({ clock }) => {
+    if (networkRef.current) {
+      networkRef.current.rotation.x = Math.sin(clock.elapsedTime * 0.3) * 0.15
+      networkRef.current.rotation.y = clock.elapsedTime * 0.08
+      networkRef.current.rotation.z = Math.cos(clock.elapsedTime * 0.2) * 0.1
+    }
+  })
+  
+  const nodes = useMemo(() => {
+    const nodePositions: [number, number, number][] = []
+    for (let i = 0; i < 50; i++) {
+      nodePositions.push([
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 8,
+        (Math.random() - 0.5) * 6
+      ])
+    }
+    return nodePositions
+  }, [])
+  
+  return (
+    <group ref={networkRef}>
+      {nodes.map((position, i) => (
+        <mesh key={i} position={position}>
+          <sphereGeometry args={[0.03, 12, 12]} />
+          <meshBasicMaterial
+            color={darkMode ? "#00FF88" : "#00D4FF"}
+            transparent
+            opacity={0.8}
+          />
+        </mesh>
+      ))}
+      
+      {/* Add some connecting lines effect */}
+      {nodes.slice(0, 20).map((position, i) => (
+        <mesh key={`line-${i}`} position={position}>
+          <cylinderGeometry args={[0.001, 0.001, 2, 8]} />
+          <meshBasicMaterial
+            color={darkMode ? "#8B5CF6" : "#6366F1"}
+            transparent
+            opacity={0.3}
+          />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function LiquidSphere({ darkMode }: { darkMode?: boolean }) {
+  const sphereRef = useRef<THREE.Mesh>(null)
+  
+  useFrame(({ clock }) => {
+    if (sphereRef.current) {
+      sphereRef.current.rotation.x = clock.elapsedTime * 0.2
+      sphereRef.current.rotation.y = clock.elapsedTime * 0.3
+      sphereRef.current.position.y = Math.sin(clock.elapsedTime) * 0.3
+    }
+  })
+  
+  return (
+    <Sphere ref={sphereRef} args={[1.2, 128, 128]} position={[-4, 0, -8]}>
+      <MeshDistortMaterial
+        color={darkMode ? "#FF6B6B" : "#8B5CF6"}
+        transparent
+        opacity={0.1}
+        distort={0.6}
+        speed={4}
+        roughness={0.2}
+      />
+    </Sphere>
+  )
+}
+
+interface ChatBackground3DProps {
+  darkMode?: boolean
+}
+
+export default function ChatBackground3D({ darkMode = false }: ChatBackground3DProps) {
+  return (
+    <div className="absolute inset-0 z-0">
+      <Canvas
+        camera={{ position: [0, 0, 1], fov: 75 }}
+        style={{
+          background: darkMode 
+            ? 'radial-gradient(ellipse at center, rgba(10, 10, 10, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%)'
+            : 'radial-gradient(ellipse at center, rgba(250, 251, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%)'
+        }}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance"
+        }}
+      >
+        <EnhancedStars darkMode={darkMode} />
+        <EnhancedFloatingOrbs darkMode={darkMode} />
+        <EnhancedNeuralNetwork darkMode={darkMode} />
+        <LiquidSphere darkMode={darkMode} />
+        
+        {/* Enhanced lighting setup */}
+        <ambientLight intensity={darkMode ? 0.2 : 0.4} />
+        <pointLight 
+          position={[10, 10, 10]} 
+          intensity={0.5} 
+          color={darkMode ? "#00FF88" : "#00D4FF"}
+          distance={20}
+        />
+        <pointLight 
+          position={[-10, -10, -10]} 
+          intensity={0.4} 
+          color={darkMode ? "#8B5CF6" : "#00FF88"}
+          distance={15}
+        />
+        <pointLight 
+          position={[0, 15, 5]} 
+          intensity={0.3} 
+          color="#FF6B6B"
+          distance={10}
+        />
+        
+        {/* Volumetric fog effect */}
+        <fog attach="fog" args={[darkMode ? '#000000' : '#ffffff', 5, 20]} />
+      </Canvas>
+    </div>
+  )
+}

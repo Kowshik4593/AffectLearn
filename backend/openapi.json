@@ -1,0 +1,27 @@
+﻿
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"openapi":"3.1.0","info":{"title":"FastAPI","version":"0.1.0"},"
+                    paths":{"/":{"get":{"summary":"Root","operationId":"root__get","r
+                    esponses":{"200":{"description":"Successful 
+                    Response","content":{"appl...
+RawContent        : HTTP/1.1 200 OK
+                    Content-Length: 15244
+                    Content-Type: application/json
+                    Date: Sun, 06 Jul 2025 15:35:36 GMT
+                    Server: uvicorn
+                    
+                    {"openapi":"3.1.0","info":{"title":"FastAPI","version":"0.1.0"},"
+                    paths":...
+Forms             : {}
+Headers           : {[Content-Length, 15244], [Content-Type, application/json], 
+                    [Date, Sun, 06 Jul 2025 15:35:36 GMT], [Server, uvicorn]}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 15244
+
+
+
