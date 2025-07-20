@@ -41,7 +41,7 @@ AffectLearn/
 
 ### Chat and Quiz Interface
 
-![Chat & Quiz](frontend/docs/chat.png)
+![Chat & Quiz](frontend/docs/Chat.png)
 
 ---
 
